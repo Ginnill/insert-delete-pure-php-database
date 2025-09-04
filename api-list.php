@@ -41,8 +41,26 @@ function remover($id)
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
-    remover($_POST['id']);
+function adicionar($nome, $preco)
+{
+    $pdo = Connection::getConnection();
+    $stmt = $pdo->prepare("INSERT INTO frutas (nome, preco, created_at) VALUES (?, ?, NOW())");
+    $stmt->execute([$nome, $preco]);
+    if ($stmt->rowCount() > 0) {
+        echo json_encode(['ok' => true]);
+    } else {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'error' => 'Erro ao adicionar fruta']);
+    }
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['id'])) {
+        remover($_POST['id']);
+    } elseif (isset($_POST['nome'], $_POST['preco'])) {
+        adicionar($_POST['nome'], $_POST['preco']);
+    }
 }
 
 try {

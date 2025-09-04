@@ -7,13 +7,14 @@
     <title>4.works teste loja</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <style type="text/tailwindcss">
-      input[type=text], input[type=email], input[type=tel], textarea{
-        @apply border border-solid border-black rounded-lg px-3 py-1 
+        input[type=text], input[type=email], input[type=tel], textarea{
+        @apply border border-solid border-gray-300 border-black rounded-lg px-3 py-2
       }
 
       input[type=submit]{
-        @apply bg-[#9562f3] px-5 py-1 text-black rounded-lg
+        @apply bg-green-500 hover:bg-green-600 px-5 py-2 text-white rounded-lg
       }
     </style>
 </head>
@@ -22,7 +23,13 @@
     <div class="container mx-auto p-4">
         <h1 class="font-bold text-3xl text-center mt-5 uppercase">Frutas</h1>
 
-        <div class="grid" id="grid">
+        <form id="form-add" class="bg-white rounded-xl shadow p-6 mb-8 flex flex-col sm:flex-row gap-4 items-center justify-center">
+            <input type="text" name="nome" placeholder="Nome da fruta" required class="flex-1 min-w-[120px]" />
+            <input type="text" id="maskMoney" name="preco" placeholder="Preço" step="0.01" min="0" required class="flex-1 min-w-[80px]" />
+            <input type="submit" value="Adicionar" class="shadow cursor-pointer transition-colors" />
+        </form>
+
+        <div class="grid mt-5" id="grid">
             <?php if (!$frutas): ?>
                 <div class="card">Nenhuma fruta encontrada.</div>
             <?php else: ?>
@@ -39,6 +46,7 @@
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
+
     </div>
 
     <script>
@@ -75,7 +83,9 @@
                 $.ajax({
                     url: 'api-list.php',
                     method: 'POST',
-                    data: { id },
+                    data: {
+                        id
+                    },
                     dataType: 'json',
                     success: function(resp) {
                         if (resp && resp.ok) {
@@ -111,6 +121,38 @@
                 }
             });
         }
+
+        $('#form-add').submit(function(e) {
+            e.preventDefault();
+            const nome = $(this).find('[name=nome]').val().trim();
+            let preco = $(this).find('[name=preco]').val().trim();
+            if (!nome || !preco) return alert('Preencha todos os campos!');
+            preco = preco.replace(/\./g, '').replace(',', '.'); // Converte para formato float
+            $.ajax({
+                url: 'api-list.php',
+                method: 'POST',
+                data: { nome, preco },
+                dataType: 'json',
+                success: function(resp) {
+                    if (resp && resp.ok) {
+                        $('#form-add')[0].reset();
+                        load();
+                    } else {
+                        alert(resp.error || 'Erro ao adicionar fruta.');
+                    }
+                },
+                error: function() {
+                    alert('Erro ao adicionar fruta.');
+                }
+            });
+        });
+
+        $(function() {
+            $('#maskMoney').mask('000.000.000,00', {
+                reverse: true
+            });
+            load();
+        });
 
         $(load);
     </script>
