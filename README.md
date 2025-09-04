@@ -21,4 +21,4 @@ Frontend:
 - jQuery (3.7) para AJAX (+ delegação de eventos).
 - jQuery Mask (1.14.16)
 - Tailwind (browser) para estilo responsivo sem build.
-- Renderização em cards <div> (sem <table>) para melhor mobile.
+- Renderização em cards div/> (sem table/>) para melhor mobile.
